@@ -24,7 +24,7 @@ void show_attacks_grid(const char (&grid)[26][26][2], int size_x, int size_y, bo
 
 int count_boats(Boat boats_array[20][2], int type_of_boat_to_count, bool player);
 
-//no utilizé ninguna variable global.
+//no utilicé ninguna variable global.
 
 int main() {
 	
