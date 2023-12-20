@@ -7,22 +7,22 @@
 
 using namespace std;
 
-struct BoatProperties {//se crea el tipo de struct "BoatProperties", que contiene todas los tipos de propiedades que puede tener un barco; las coordenadas X e Y de cada una de sus cinco (o menos) casillas, la length del barco, su orientacion en el tablero y si está colocado o no en este.
+struct Boat {//se crea el tipo de struct "Boat", que contiene todas los tipos de propiedades que puede tener un barco; las coordenadas X e Y de cada una de sus cinco (o menos) casillas, la length del barco, su orientacion en el tablero y si está colocado o no en este.
 
     char x_pos[5], y_pos[5], length;
     bool orientation, placed;
 };
 
-void select_match_available_boats(BoatProperties(&boats_array)[20][2]);
+void select_match_available_boats(Boat(&boats_array)[20][2]);
 
-void place_boats(char(&grid)[26][26][2], string nick, BoatProperties(&boats_array)[20][2], int size_x, int size_y, bool player);
+void place_boats(char(&grid)[26][26][2], string nick, Boat(&boats_array)[20][2], int size_x, int size_y, bool player);
 
-bool start_match(char(&grid)[26][26][2], string nick[2], int size_x, int size_y, BoatProperties(&boats_array)[20][2]);
+bool start_match(char(&grid)[26][26][2], string nick[2], int size_x, int size_y, Boat(&boats_array)[20][2]);
 
 void display_my_grid(const char (&casillero)[26][26][2], int size_x, int size_y, bool player);
 void show_attacks_grid(const char (&casillero)[26][26][2], int size_x, int size_y, bool player);
 
-int count_boats(BoatProperties boats_array[20][2], int type_of_boat_to_count, bool player);
+int count_boats(Boat boats_array[20][2], int type_of_boat_to_count, bool player);
 
 //no utilizé ninguna variable global.
 
@@ -55,7 +55,7 @@ int main() {
             }
         }
 
-        BoatProperties boats_array[20][2];
+        Boat boats_array[20][2];
         for (i = 0; i < 20; i++) {
             for (int j = 0; j < 2; j++){
                 for (int k = 0; k < 5; k++){
@@ -101,7 +101,7 @@ int main() {
 }
 
 
-void select_match_available_boats(BoatProperties(&boats_array)[20][2]) {//esta funcion crea todos los barcos y los coloca ordenadamente en el array "boats_array", pero no les asigna una posicion en el casillero
+void select_match_available_boats(Boat(&boats_array)[20][2]) {//esta funcion crea todos los barcos y los coloca ordenadamente en el array "boats_array", pero no les asigna una posicion en el casillero
 
     int i, small_boats_count, med_boats_count, big_boats_count, huge_boats_count, total_boat_count;
 
@@ -150,7 +150,7 @@ void select_match_available_boats(BoatProperties(&boats_array)[20][2]) {//esta f
 }
 
 
-void place_boats(char(&grid)[26][26][2], string nick, BoatProperties(&boats_array)[20][2], int size_x, int size_y, bool player) {
+void place_boats(char(&grid)[26][26][2], string nick, Boat(&boats_array)[20][2], int size_x, int size_y, bool player) {
     int i;
 
     cout << "\n\n-----------------------------------------DISPOSICION DE LOS BARCOS-----------------------------------------\n\n";
@@ -331,7 +331,7 @@ void place_boats(char(&grid)[26][26][2], string nick, BoatProperties(&boats_arra
 }
 
 
-bool start_match(char(&grid)[26][26][2], string nick[2], int size_x, int size_y, BoatProperties(&boats_array)[20][2]) {
+bool start_match(char(&grid)[26][26][2], string nick[2], int size_x, int size_y, Boat(&boats_array)[20][2]) {
     int i, j;
     int contador_aciertos[2], contador_fallos[2], contador_tiros[2];
     
@@ -547,7 +547,7 @@ void show_attacks_grid(const char(&casillero)[26][26][2], int size_x, int size_y
 }
 
 
-int count_boats(BoatProperties boats_array[20][2], int type_of_boat_to_count, bool player) {
+int count_boats(Boat boats_array[20][2], int type_of_boat_to_count, bool player) {
 
     int i;
 
