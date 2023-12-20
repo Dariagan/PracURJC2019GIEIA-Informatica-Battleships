@@ -9,20 +9,20 @@ using namespace std;
 
 struct BoatProperties {//se crea el tipo de struct "BoatProperties", que contiene todas los tipos de propiedades que puede tener un barco; las coordenadas X e Y de cada una de sus cinco (o menos) casillas, la length del barco, su orientacion en el tablero y si está colocado o no en este.
 
-    int x_pos[5], y_pos[5], length;
+    char x_pos[5], y_pos[5], length;
     bool orientation, placed;
 };
 
-void createBoats(BoatProperties(&boats_array)[20][2]);
+void select_match_available_boats(BoatProperties(&boats_array)[20][2]);
 
-void placeBoats(char(&grid)[26][26][2], string nick, BoatProperties(&boats_array)[20][2], int size_x, int size_y, bool player);
+void place_boats(char(&grid)[26][26][2], string nick, BoatProperties(&boats_array)[20][2], int size_x, int size_y, bool player);
 
-bool startMatch(char(&grid)[26][26][2], string nick[2], int size_x, int size_y, BoatProperties(&boats_array)[20][2]);
+bool start_match(char(&grid)[26][26][2], string nick[2], int size_x, int size_y, BoatProperties(&boats_array)[20][2]);
 
-void showGrid(const char (&casillero)[26][26][2], int size_x, int size_y, bool player);
-void showEnemyGrid(const char (&casillero)[26][26][2], int size_x, int size_y, bool player);
+void display_my_grid(const char (&casillero)[26][26][2], int size_x, int size_y, bool player);
+void show_attacks_grid(const char (&casillero)[26][26][2], int size_x, int size_y, bool player);
 
-int countBoats(BoatProperties boats_array[20][2], int type_of_boat_to_count, bool player);
+int count_boats(BoatProperties boats_array[20][2], int type_of_boat_to_count, bool player);
 
 //no utilizé ninguna variable global.
 
@@ -67,10 +67,10 @@ int main() {
             }
         }
 
-        createBoats(boats_array);//se llama a la funcion que crea todos los barcos
+        select_match_available_boats(boats_array);//se llama a la funcion que crea todos los barcos
 
         //se empieza a crear el casillero
-        int size_x, size_y;
+        char size_x, size_y;
 
         for (;;) {
 
@@ -86,10 +86,10 @@ int main() {
             else break;//si el player introduce unas dimensiones sensatas del casillero, el programa escapa del bucle "for" infinito y prosigue.  
         }
 
-        placeBoats(grid, player_names[0], boats_array, size_x, size_y, 0);
-        placeBoats(grid, player_names[1], boats_array, size_x, size_y, 1);
+        place_boats(grid, player_names[0], boats_array, size_x, size_y, 0);
+        place_boats(grid, player_names[1], boats_array, size_x, size_y, 1);
 
-        bool winner(startMatch(grid, player_names, size_x, size_y, boats_array));
+        bool winner(start_match(grid, player_names, size_x, size_y, boats_array));
 
         cout << endl << player_names[!winner] << ", quieres la revancha? Escribe 'si' si quieres jugar otra partida. Si quieres cerrar el juego, escribe cualquier cosa: ";
 
@@ -101,9 +101,9 @@ int main() {
 }
 
 
-void createBoats(BoatProperties(&boats_array)[20][2]) {//esta funcion crea todos los barcos y los coloca ordenadamente en el array "boats_array", pero no les asigna una posicion en el casillero
+void select_match_available_boats(BoatProperties(&boats_array)[20][2]) {//esta funcion crea todos los barcos y los coloca ordenadamente en el array "boats_array", pero no les asigna una posicion en el casillero
 
-    int i, small_boats_count, med_boats_count, big_boats_count, huge_boats_count, numero_btotales;
+    int i, small_boats_count, med_boats_count, big_boats_count, huge_boats_count, total_boat_count;
 
     for (;;) {
 
@@ -115,17 +115,14 @@ void createBoats(BoatProperties(&boats_array)[20][2]) {//esta funcion crea todos
 
         cin >> small_boats_count >> med_boats_count >> big_boats_count >> huge_boats_count;//se introduce la cantidad de cada tipo de barco en su respectiva variable
 
-        numero_btotales = small_boats_count + med_boats_count + big_boats_count + huge_boats_count; //se hace el sumatorio de todos los barcos que hay, y si sobrepasa veinte, el programa te hace reintroducirlos
+        total_boat_count = small_boats_count + med_boats_count + big_boats_count + huge_boats_count; //se hace el sumatorio de todos los barcos que hay, y si sobrepasa veinte, el programa te hace reintroducirlos
 
-        if (numero_btotales > 20 || numero_btotales < 1) {
+        if (total_boat_count > 20 || total_boat_count < 1) {
 
             cout << "El programa no admite una cantidad de barcos totales mayor a veinte ni menor a uno.\n";
             continue; //el programa no permite al usuario salir de este bucle "for" infinito hasta que haya puesto una cantidad de barcos sensata
         }
-        else {
-
-            break; //el programa sale del bucle "for" si el usuario introdujo una cantidad de barcos permitida.
-        }
+        else break; //el programa sale del bucle "for" si el usuario introdujo una cantidad de barcos permitida.
     }
     //lo siguiente parece muy complejo, pero en realidad lo unico que se hace es rellenar el array "boats_array" con cada barco existente. Se rellena ordenadamente sin dejar huecos vacios o rellenando posiciones ya rellenadas.
     for (i = 0; i < small_boats_count; i++) {
@@ -153,7 +150,7 @@ void createBoats(BoatProperties(&boats_array)[20][2]) {//esta funcion crea todos
 }
 
 
-void placeBoats(char(&grid)[26][26][2], string nick, BoatProperties(&boats_array)[20][2], int size_x, int size_y, bool player) {
+void place_boats(char(&grid)[26][26][2], string nick, BoatProperties(&boats_array)[20][2], int size_x, int size_y, bool player) {
     int i;
 
     cout << "\n\n-----------------------------------------DISPOSICION DE LOS BARCOS-----------------------------------------\n\n";
@@ -161,14 +158,14 @@ void placeBoats(char(&grid)[26][26][2], string nick, BoatProperties(&boats_array
     cout << "\nLe toca a " << nick << " posicionar sus barcos; el otro player, NO MIRE \n\n";
 
     cout << "Este es su casillero, " << nick << ": ";
-    showGrid(grid, size_x, size_y, player);//se le muestra el casillero al player x, mediante una funcion independiente.
+    display_my_grid(grid, size_x, size_y, player);//se le muestra el casillero al player x, mediante una funcion independiente.
     cout << "Los numeros de arriba indican la columna, y las letras de la izquierda la fila.\n\n";
 
-    int barco_elegido;// se crea la variable barco_elegido, que se va a utilizar posteriormente para manipular el array "grid".
+    int selected_boat_type;// se crea la variable selected_boat_type, que se va a utilizar posteriormente para manipular el array "grid".
     for (;;) {
 
         cout << "Que barco quieres posicionar o reposicionar? (escribir el numero): \n";
-        for (i = 0; i < countBoats(boats_array, 0, 0); i++) {
+        for (i = 0; i < count_boats(boats_array, 0, 0); i++) {
 //se muestran todos los barcos disponibles que hay para posicionar, enumerados en orden para diferenciar barcos del mismo tipo
             cout << i + 1 << ": barco ";
             switch (boats_array[i][player].length) {
@@ -177,44 +174,43 @@ void placeBoats(char(&grid)[26][26][2], string nick, BoatProperties(&boats_array
                 cout << "pequeno " << i + 1;
                 break;
             case 3:
-                cout << "mediano " << (i + 1) - countBoats(boats_array, 2, 0);
+                cout << "mediano " << (i + 1) - count_boats(boats_array, 2, 0);
                 break;
             case 4:
-                cout << "grande " << (i + 1) - (countBoats(boats_array, 2, 0) + (countBoats(boats_array, 3, 0)));
+                cout << "grande " << (i + 1) - (count_boats(boats_array, 2, 0) + (count_boats(boats_array, 3, 0)));
                 break;
             case 5:
-                cout << "muy grande " << (i + 1 - (countBoats(boats_array, 2, 0) + (countBoats(boats_array, 3, 0) + (countBoats(boats_array, 4, 0)))));
+                cout << "muy grande " << (i + 1 - (count_boats(boats_array, 2, 0) + (count_boats(boats_array, 3, 0) + (count_boats(boats_array, 4, 0)))));
                 break;
             }
             cout << endl;
         }// Aqui termina el mostrador de los barcos disponibles a posicionar.
-        if (countBoats(boats_array, 1, player) == countBoats(boats_array, 0, 0)) {
+        if (count_boats(boats_array, 1, player) == count_boats(boats_array, 0, 0)) {
 //Si el numero de barcos posicionados es igual al numero de barcos totales, se le permite al player x terminar su preparación
             cout << "Ya has posicionado todos tus barcos disponibles, si quieres terminar tu preparacion, escribe '100'\n";
         }
 
-        cin >> barco_elegido;
-        barco_elegido--; // se le resta una unidad al int "barco_elegido" para que se adapte a las posiciones de los arrays, que empiezan en cero.
+        cin >> selected_boat_type;
+        selected_boat_type--; // se le resta una unidad al int "selected_boat_type" para que se adapte a las posiciones de los arrays, que empiezan en cero.
 
-        if (barco_elegido == 99 && countBoats(boats_array, 1, player) == countBoats(boats_array, 0, 0)) {
+        if (selected_boat_type == 99 && count_boats(boats_array, 1, player) == count_boats(boats_array, 0, 0)) {
 //si el player introduce un 99 (100 - 1) y tiene disponible la opción de terminar su preparación
             return;
         }
-        if (barco_elegido < 0 || barco_elegido > countBoats(boats_array, 0, 0)) {
+        if (selected_boat_type < 0 || selected_boat_type > count_boats(boats_array, 0, 0)) {
 //si el player elige un barco negativo o mayor al numero de barcos disponibles, el programa le obliga a elegir otro.
             cout << "Has elegido un barco inexistente.\n\n";
             continue;
         }
 
-        showGrid(grid, size_x, size_y, player);
+        display_my_grid(grid, size_x, size_y, player);
 
         cout << "\nDonde lo quieres poner y con que orientation?, escribe [numero de la columna][espacio][letra de la fila][espacio][H ó V] para elegir la posicion y la orientation del barco.\n";
         cout << "Ejemplos: 3 A V, 4 D H, 8 C V  9 J V. La 'H' significa que se va a poner horizontalmente y la 'V' significa que se va a poner verticalmente.\n";
         cout << "Si quieres cambiar otro barco, escribe '10 * *'\n";
 
         while (1) {
-
-        introduccion_posicion:
+        loop_start:
 
             int input_x_coord;
             char input_letter_coord;
@@ -229,7 +225,7 @@ void placeBoats(char(&grid)[26][26][2], string nick, BoatProperties(&boats_array
             bool orientacionintroducida = toupper(orientation_char) - 'H';// la letra introducida 'H' ó 'V' se vuelve un 0 o 1 booleano al restarse el valor de 'H'
             
 
-            boats_array[barco_elegido][player].orientation = orientacionintroducida;
+            boats_array[selected_boat_type][player].orientation = orientacionintroducida;
             
 
             if (input_letter_coord >= 'a' && input_letter_coord <= 'z') {
@@ -246,57 +242,57 @@ void placeBoats(char(&grid)[26][26][2], string nick, BoatProperties(&boats_array
             }
 
             //este "if" borra todas las casillas ocupadas anteriormente por un barco que acabó de ser movido ahora mismo, así no hay numeros '1' donde en realidad no hay nada
-            if (boats_array[barco_elegido][player].placed == true) {
+            if (boats_array[selected_boat_type][player].placed == true) {
 
-                for (i = 0; i < boats_array[barco_elegido][player].length; i++) {
+                for (i = 0; i < boats_array[selected_boat_type][player].length; i++) {
 
-                    (grid)[boats_array[barco_elegido][player].x_pos[i]][boats_array[barco_elegido][player].y_pos[i]][player] = 0;
+                    (grid)[boats_array[selected_boat_type][player].x_pos[i]][boats_array[selected_boat_type][player].y_pos[i]][player] = 0;
                 }
             }
 
             bool grid_bounds_reached = false;
-            int temp_x[5]; 
-            int temp_y[5];
+            char temp_x[5]; 
+            char temp_y[5];
 
-            for (i = 0; i < boats_array[barco_elegido][player].length; i++) {
+            for (i = 0; i < boats_array[selected_boat_type][player].length; i++) {
 
-                temp_x[i] = boats_array[barco_elegido][player].x_pos[i]; //se guarda los datos numericos de las coordenadas previas antes de reemplazar las coordenadas por las nuevas coordenadas...
-                temp_y[i] = boats_array[barco_elegido][player].y_pos[i];//...de esta forma, si se cancela el movimiento, se puede revertir el cambio poniendole al barco de vuelta las coordenadas anteriores.
+                temp_x[i] = boats_array[selected_boat_type][player].x_pos[i]; //se guarda los datos numericos de las coordenadas previas antes de reemplazar las coordenadas por las nuevas coordenadas...
+                temp_y[i] = boats_array[selected_boat_type][player].y_pos[i];//...de esta forma, si se cancela el movimiento, se puede revertir el cambio poniendole al barco de vuelta las coordenadas anteriores.
             }
 
-            for (i = 0; i < boats_array[barco_elegido][player].length; i++) {
+            for (i = 0; i < boats_array[selected_boat_type][player].length; i++) {
 
-                if (boats_array[barco_elegido][player].orientation == 0) {//si el barco está puesto horizontalmente, se hace esto
+                if (boats_array[selected_boat_type][player].orientation == 0) {//si el barco está puesto horizontalmente, se hace esto
 
-                    boats_array[barco_elegido][player].y_pos[i] = input_y_coord;//si está puesto horizontalmente el barco, la coordenada Y de las i casillas no varía
+                    boats_array[selected_boat_type][player].y_pos[i] = input_y_coord;//si está puesto horizontalmente el barco, la coordenada Y de las i casillas no varía
 
                     if ( ! grid_bounds_reached ) 
-                        boats_array[barco_elegido][player].x_pos[i] = input_x_coord + i;//si no se alcanza el borde derecho del tablero, se rellena de izquierda a derecha.    
+                        boats_array[selected_boat_type][player].x_pos[i] = input_x_coord + i;//si no se alcanza el borde derecho del tablero, se rellena de izquierda a derecha.    
                     else 
-                        boats_array[barco_elegido][player].x_pos[i] = input_x_coord - i;//si se alcanzó el borde derecho del tablero, se vuelve a rellenar pero de derecha a izquierda en vez de izquierda a derecha.
+                        boats_array[selected_boat_type][player].x_pos[i] = input_x_coord - i;//si se alcanzó el borde derecho del tablero, se vuelve a rellenar pero de derecha a izquierda en vez de izquierda a derecha.
                     
 
-                    if (boats_array[barco_elegido][player].x_pos[i] == size_x && grid_bounds_reached == false) { //si se llega al borde derecho del tablero...      	
+                    if (boats_array[selected_boat_type][player].x_pos[i] == size_x && grid_bounds_reached == false) { //si se llega al borde derecho del tablero...      	
                         i = -1; //...se reinicia el bucle "for"
                         grid_bounds_reached = true;//y esto se pone con valor "true" para que no se vuelva a meter el programa en este "if" y ejecute el procedimiento si se alcanzó el borde derecho del tablero
                         continue; // la "i" se vuelve cero de vuelta
                     }
 
                 }
-                else if (boats_array[barco_elegido][player].orientation == 1) {//si el barco está puesto verticalmente, se hace esto
+                else if (boats_array[selected_boat_type][player].orientation == 1) {//si el barco está puesto verticalmente, se hace esto
 
-                    boats_array[barco_elegido][player].x_pos[i] = input_x_coord;//si está puesto verticalmente el barco, la coordenada X de las i casillas no varía
+                    boats_array[selected_boat_type][player].x_pos[i] = input_x_coord;//si está puesto verticalmente el barco, la coordenada X de las i casillas no varía
 
                     if (grid_bounds_reached == false) {
 
-                        boats_array[barco_elegido][player].y_pos[i] = input_y_coord + i;//si no se alcanza el borde inferior del tablero, se rellena de arriba a abajo
+                        boats_array[selected_boat_type][player].y_pos[i] = input_y_coord + i;//si no se alcanza el borde inferior del tablero, se rellena de arriba a abajo
                     }
                     else {
                     	
-                        boats_array[barco_elegido][player].y_pos[i] = input_y_coord - i;//si se alcanzó el borde inferior del tablero, se vuelve a rellenar pero de abajo a arriba en vez de arriba a abajo.
+                        boats_array[selected_boat_type][player].y_pos[i] = input_y_coord - i;//si se alcanzó el borde inferior del tablero, se vuelve a rellenar pero de abajo a arriba en vez de arriba a abajo.
                     }
 
-                    if (boats_array[barco_elegido][player].y_pos[i] == size_y && grid_bounds_reached == false) {//si se llega al borde inferior del tablero...
+                    if (boats_array[selected_boat_type][player].y_pos[i] == size_y && grid_bounds_reached == false) {//si se llega al borde inferior del tablero...
                     	
                         i = -1;//...se reinicia el bucle "for"
                         grid_bounds_reached = true;//y esto se pone con valor "true" para que no se vuelva a meter el programa en este "if" y ejecute el procedimiento si se alcanzó el limite inferior del tablero
@@ -305,29 +301,29 @@ void placeBoats(char(&grid)[26][26][2], string nick, BoatProperties(&boats_array
                 }
             }
 
-            for (i = 0; i < boats_array[barco_elegido][player].length; i++) {
+            for (i = 0; i < boats_array[selected_boat_type][player].length; i++) {
 
-                if ((grid)[boats_array[barco_elegido][player].x_pos[i]][boats_array[barco_elegido][player].y_pos[i]][player] == 1) {
+                if ((grid)[boats_array[selected_boat_type][player].x_pos[i]][boats_array[selected_boat_type][player].y_pos[i]][player] == 1) {
 // si se detecta que una de las casillas que se quieren ocupar con el barco que se quiere poner ya está rellena, el programa te avisa y te obliga a elegir otra posicion o poner otro barco.
                     cout << "Has elegido una posicion que implicaria ocupar casillas de otro barco ya puesto\nSi quieres cambiar otro barco, escribe '10 * *'. Si quieres elegir otra posicion, escribe otra posicion y orientation: ";
 
-                    for (i = 0; i < boats_array[barco_elegido][player].length && boats_array[barco_elegido][player].placed == true; i++) {
+                    for (i = 0; i < boats_array[selected_boat_type][player].length && boats_array[selected_boat_type][player].placed == true; i++) {
 //si el barco que se quería poner ya estaba puesto en otro lugar previamente, el programa revierte sus coordenadas a sus coordenadas anteriores y lo deja donde estaba.
-                        boats_array[barco_elegido][player].x_pos[i] = temp_x[i];
-                        boats_array[barco_elegido][player].y_pos[i] = temp_y[i];
+                        boats_array[selected_boat_type][player].x_pos[i] = temp_x[i];
+                        boats_array[selected_boat_type][player].y_pos[i] = temp_y[i];
                         
                     }
 
-                    goto introduccion_posicion;//aquí utilizé un "goto" porque no había otra alternativa, si utilizo un "break" se van a producir las acciones siguientes, cosa que no quiero.
+                    goto loop_start;//aquí utilizé un "goto" porque no había otra alternativa, si utilizo un "break" se van a producir las acciones siguientes, cosa que no quiero.
                 }
             }//si se consigue cruzar este "for" detector de casillas ya ocupadas, se rellenan todas las casillas comprobadas con numeros '1'
-            for (i = 0; i < boats_array[barco_elegido][player].length; i++) {
+            for (i = 0; i < boats_array[selected_boat_type][player].length; i++) {
 
-                (grid)[boats_array[barco_elegido][player].x_pos[i]][boats_array[barco_elegido][player].y_pos[i]][player] = 1;
+                (grid)[boats_array[selected_boat_type][player].x_pos[i]][boats_array[selected_boat_type][player].y_pos[i]][player] = 1;
             }
 
-            boats_array[barco_elegido][player].placed = true;//el barco elegido se define como puesto en el casillero
-            showGrid(grid, size_x, size_y, player);//se muestra el casillero para ver cómo quedó el nuevo barco puesto 
+            boats_array[selected_boat_type][player].placed = true;//el barco elegido se define como puesto en el casillero
+            display_my_grid(grid, size_x, size_y, player);//se muestra el casillero para ver cómo quedó el nuevo barco puesto 
             break;//escape de este bucle "while" que se encarga de posicionar el barco elegido.
         }
 
@@ -335,7 +331,7 @@ void placeBoats(char(&grid)[26][26][2], string nick, BoatProperties(&boats_array
 }
 
 
-bool startMatch(char(&grid)[26][26][2], string nick[2], int size_x, int size_y, BoatProperties(&boats_array)[20][2]) {
+bool start_match(char(&grid)[26][26][2], string nick[2], int size_x, int size_y, BoatProperties(&boats_array)[20][2]) {
     int i, j;
     int contador_aciertos[2], contador_fallos[2], contador_tiros[2];
     
@@ -359,10 +355,10 @@ bool startMatch(char(&grid)[26][26][2], string nick[2], int size_x, int size_y, 
     while (1) {
 
         cout << "Tu casillero actualmente, " << nick[player_on_turn] << ": ";
-        showGrid(grid, size_x, size_y, player_on_turn);//simplemente se muestra el casillero normal que muestra tu propio casillero para ver que has perdido...
+        display_my_grid(grid, size_x, size_y, player_on_turn);//simplemente se muestra el casillero normal que muestra tu propio casillero para ver que has perdido...
 		//...cada vez que vuelve a ser tu turno, tras el ataque del enemigo.
         cout << "El casillero de tus ataques al enemigo:";//se muestra el casillero mencionado anteriormente, de los signos de preguntas. Este registra los ataques hechos al enemigo.
-        showEnemyGrid(casillero_registrodeataques, size_x, size_y, player_on_turn);
+        show_attacks_grid(casillero_registrodeataques, size_x, size_y, player_on_turn);
 
 
         for (;;) {
@@ -392,7 +388,7 @@ bool startMatch(char(&grid)[26][26][2], string nick[2], int size_x, int size_y, 
                 cout << "\n\nAL ATACAR LA POSICION " << input_x_coord + 1 << " " << input_letter_coord << ", HAS DADO EN EL BLANCO.";
                 
                 casillero_registrodeataques[attacked_x][attacked_y][player_on_turn] = 'X';//se marca una 'X' en la posicion correspondiente del casillero-registro de ataques al enemigo
-                showEnemyGrid(casillero_registrodeataques, size_x, size_y, player_on_turn);// se muestra este mismo casillero, el '?' fue reemplazado por una 'X'
+                show_attacks_grid(casillero_registrodeataques, size_x, size_y, player_on_turn);// se muestra este mismo casillero, el '?' fue reemplazado por una 'X'
 
                 int barcoatacado = 0;
                 for (i = 0; i < 20; i++) {//este bucle 'for' chequea barco por barco del array "array_barcos"...
@@ -407,15 +403,12 @@ bool startMatch(char(&grid)[26][26][2], string nick[2], int size_x, int size_y, 
                     }
                 }
                 
-                int contadorcasillasdestruidas = 0;
+                int hit_boat_tiles_count = 0;
                 for (i = 0; i < boats_array[barcoatacado][!player_on_turn].length; i++) {
 
-                    if (boats_array[barcoatacado][!player_on_turn].x_pos[i] == -1) {
-
-                        contadorcasillasdestruidas++;//se cuenta el numero de casillas destruidas de el barco atacado.
-                    }
+                    hit_boat_tiles_count += boats_array[barcoatacado][!player_on_turn].x_pos[i] == -1;
                 }
-                if (contadorcasillasdestruidas == boats_array[barcoatacado][!player_on_turn].length) {
+                if (hit_boat_tiles_count == boats_array[barcoatacado][!player_on_turn].length) {
 					//si el numero de casillas destruidas es igual a la length del barco atacado, este se detecta como destruido y se le avisa al player atacante.
                     cout << "\nIMPORTANTE: Con ese ataque has hundido un barco enemigo en su totalidad.";
                 }
@@ -432,12 +425,12 @@ bool startMatch(char(&grid)[26][26][2], string nick[2], int size_x, int size_y, 
                 casillero_registrodeataques[attacked_x][attacked_y][player_on_turn] = '/';// el casillero de registro de ataques vuelve a esa posición un '/' (que significa que no hay nada ahí)
                 contador_fallos[player_on_turn]++;//se suma uno al contador de tiros fallados
                 cout << "\n\nDesafortunadamente, no hay nada ahi.";
-                showEnemyGrid(casillero_registrodeataques, size_x, size_y, player_on_turn);//se le muestra al atacante su casillero de registro de ataques.
+                show_attacks_grid(casillero_registrodeataques, size_x, size_y, player_on_turn);//se le muestra al atacante su casillero de registro de ataques.
                 break;
             }
         }
 
-        if (countBoats(boats_array, -1, !player_on_turn) == countBoats(boats_array, 0, !player_on_turn)) {//esto es un detector de si se ganó la partida tras el último ataque del player.
+        if (count_boats(boats_array, -1, !player_on_turn) == count_boats(boats_array, 0, !player_on_turn)) {//esto es un detector de si se ganó la partida tras el último ataque del player.
 			
 			for (i=0;i<2;i++)
             contador_tiros[i] = contador_fallos[i] + contador_aciertos[i];	//el contador de tiros totales es igual a la suma de los tiros fallados y los tiros acertados.
@@ -454,15 +447,15 @@ bool startMatch(char(&grid)[26][26][2], string nick[2], int size_x, int size_y, 
             cout << "Precision:          " << fixed << setprecision(1) << float(contador_aciertos[player_on_turn])*100/float(contador_tiros[player_on_turn]) << "%\n\n";
             
             
-            cout << "Barcos perdidos en total:    " << countBoats(boats_array, -1, player_on_turn) << endl;
-            if (countBoats (boats_array, 2, 0) > 0)
-                cout << "Barcos pequenos perdidos:    " << countBoats(boats_array, -2, player_on_turn) << endl;
-            if (countBoats (boats_array, 3, 0) > 0)
-                cout << "Barcos medianos perdidos:    " << countBoats(boats_array, -3, player_on_turn) << endl;
-            if (countBoats (boats_array, 4, 0) > 0)
-                cout << "Barcos grandes perdidos:     " << countBoats(boats_array, -4, player_on_turn) << endl;
-            if (countBoats (boats_array, 5, 0) > 0)
-                cout << "Barcos muy grandes perdidos: " << countBoats(boats_array, -5, player_on_turn) << endl;
+            cout << "Barcos perdidos en total:    " << count_boats(boats_array, -1, player_on_turn) << endl;
+            if (count_boats (boats_array, 2, 0) > 0)
+                cout << "Barcos pequenos perdidos:    " << count_boats(boats_array, -2, player_on_turn) << endl;
+            if (count_boats (boats_array, 3, 0) > 0)
+                cout << "Barcos medianos perdidos:    " << count_boats(boats_array, -3, player_on_turn) << endl;
+            if (count_boats (boats_array, 4, 0) > 0)
+                cout << "Barcos grandes perdidos:     " << count_boats(boats_array, -4, player_on_turn) << endl;
+            if (count_boats (boats_array, 5, 0) > 0)
+                cout << "Barcos muy grandes perdidos: " << count_boats(boats_array, -5, player_on_turn) << endl;
                 
                 
             cout << "\n------------------------------------------------------------------------------------------------\n\n";
@@ -475,15 +468,15 @@ bool startMatch(char(&grid)[26][26][2], string nick[2], int size_x, int size_y, 
             cout << "Precision:          " << fixed <<setprecision(1) << float(contador_aciertos[!player_on_turn])*100/float(contador_tiros[!player_on_turn]) << "%\n\n";
             
             
-            cout << "Barcos perdidos en total:    " << countBoats(boats_array, -1, !player_on_turn) << endl;
-            if (countBoats (boats_array, 2, 0) > 0)
-                cout << "Barcos pequenos perdidos:    " << countBoats(boats_array, -2, !player_on_turn) << endl;
-            if (countBoats (boats_array, 3, 0) > 0)
-                cout << "Barcos medianos perdidos:    " << countBoats(boats_array, -3, !player_on_turn) << endl;
-            if (countBoats (boats_array, 4, 0) > 0)
-                cout << "Barcos grandes perdidos:     " << countBoats(boats_array, -4, !player_on_turn) << endl;
-            if (countBoats (boats_array, 5, 0) > 0)
-                cout << "Barcos muy grandes perdidos: " << countBoats(boats_array, -5, !player_on_turn) << endl;
+            cout << "Barcos perdidos en total:    " << count_boats(boats_array, -1, !player_on_turn) << endl;
+            if (count_boats (boats_array, 2, 0) > 0)
+                cout << "Barcos pequenos perdidos:    " << count_boats(boats_array, -2, !player_on_turn) << endl;
+            if (count_boats (boats_array, 3, 0) > 0)
+                cout << "Barcos medianos perdidos:    " << count_boats(boats_array, -3, !player_on_turn) << endl;
+            if (count_boats (boats_array, 4, 0) > 0)
+                cout << "Barcos grandes perdidos:     " << count_boats(boats_array, -4, !player_on_turn) << endl;
+            if (count_boats (boats_array, 5, 0) > 0)
+                cout << "Barcos muy grandes perdidos: " << count_boats(boats_array, -5, !player_on_turn) << endl;
 
 
             return player_on_turn;//se devuelve al player winner y se sale de esta función
@@ -506,39 +499,32 @@ bool startMatch(char(&grid)[26][26][2], string nick[2], int size_x, int size_y, 
 }
 
 
-void showGrid(const char (&casillero)[26][26][2], int size_x, int size_y, bool player) {//Esta funcion muestra el estado actual del casillero del player X
+void display_my_grid(const char (&casillero)[26][26][2], int size_x, int size_y, bool player) {//Esta funcion muestra el estado actual del casillero del player X
 
     int i, j;
 
     cout << "\n\n  "; //Esta sección escribe los numeros de arriba que indican la coordenada X de cierta columna.
     for (i = 0; i < size_x && i < 10; i++) {
-
         cout << " " << i + 1;
     }
     for (; i < size_x; i++) {//Cuando se llegan a numeros de dos digitos (10 11 12 13...) el programa escribe estos sin escribir un espacio en el medio (10111213...) para que no se descoordinen con la columna a la que se refieren
-
         cout << i + 1;
     }
     cout << "\n\n";
 
     char letra_fila = 'A';//Esta sección escribe las letras de la izquierda que indican la coordenada Y de cierta fila.
     for (i = 0; i < size_y; i++) {
-
         cout << letra_fila++ << ": ";
-
         for (j = 0; j < size_x; j++) {
-
             cout << casillero[j][i][player] << " ";
         }
-
         cout << endl;
     }
     cout << endl << endl;
     return;
 }
 
-
-void showEnemyGrid(const char(&casillero)[26][26][2], int size_x, int size_y, bool player) {//Esta funcion muestra el estado actual del casillero del player X
+void show_attacks_grid(const char(&casillero)[26][26][2], int size_x, int size_y, bool player) {//Esta funcion muestra el estado actual del casillero del player X
     int i, j;
     cout << "\n\n  "; //Esta sección escribe los numeros de arriba que indican la coordenada X de cierta columna.
     for (i = 0; i < size_x && i < 10; i++) {
@@ -561,11 +547,11 @@ void showEnemyGrid(const char(&casillero)[26][26][2], int size_x, int size_y, bo
 }
 
 
-int countBoats(BoatProperties boats_array[20][2], int type_of_boat_to_count, bool player) {
+int count_boats(BoatProperties boats_array[20][2], int type_of_boat_to_count, bool player) {
 
     int i;
 
-    int contador_bhundidosmuygrandes = 0;
+    int boat_count = 0;
     for (i = 0; i < 20; i++) {//contaduría de cada barco
 
         int hit_tiles = 0;
@@ -573,9 +559,9 @@ int countBoats(BoatProperties boats_array[20][2], int type_of_boat_to_count, boo
 
             hit_tiles += boats_array[i][player].x_pos[j] == -1;
         }
-        contador_bhundidosmuygrandes += hit_tiles == boats_array[i][player].length;
+        boat_count += hit_tiles == boats_array[i][player].length;
     }
-    return contador_bhundidosmuygrandes ;
+    return boat_count ;
 
 
 }
