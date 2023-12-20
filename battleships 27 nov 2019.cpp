@@ -19,8 +19,8 @@ void place_boats(char(&grid)[26][26][2], string nick, Boat(&boats_array)[20][2],
 
 bool start_match(char(&grid)[26][26][2], string nick[2], int size_x, int size_y, Boat(&boats_array)[20][2]);
 
-void display_my_grid(const char (&casillero)[26][26][2], int size_x, int size_y, bool player);
-void show_attacks_grid(const char (&casillero)[26][26][2], int size_x, int size_y, bool player);
+void display_my_grid(const char (&grid)[26][26][2], int size_x, int size_y, bool player);
+void show_attacks_grid(const char (&grid)[26][26][2], int size_x, int size_y, bool player);
 
 int count_boats(Boat boats_array[20][2], int type_of_boat_to_count, bool player);
 
@@ -45,12 +45,12 @@ int main() {
 
         cout << "\n-----------------------------------------Bienvenidos al juego de hundir la flota-----------------------------------------\n\n";
 
-        char grid[26][26][2];//casillero dual (una matriz 7x7 para cada player). Cada dimension: eje x, eje y, jugadores. No registra los barcos para facilitar la visualizacion del tablero mediante un bucle "for", al no tener que involucrar las dimensiones del barco que es y sus respectivas casillas que ocupa.
+        char grid[26][26][2];//grid dual (una matriz 7x7 para cada player). Cada dimension: eje x, eje y, jugadores. No registra los barcos para facilitar la visualizacion del tablero mediante un bucle "for", al no tener que involucrar las dimensiones del barco que es y sus respectivas casillas que ocupa.
 
         for (int i = 0; i < 26; i++){
             for (int j = 0; j < 26; j++){
                 for (int k = 0; k < 2; k++){
-                    grid[i][j][k] = 0; // se vacía el casillero de los barcos
+                    grid[i][j][k] = 0; // se vacía el grid de los barcos
                 }
             }
         }
@@ -60,7 +60,7 @@ int main() {
             for (int j = 0; j < 2; j++){
                 for (int k = 0; k < 5; k++){
                     boats_array[i][j].length = -100;
-                    boats_array[i][j].placed = false;// al empezar, todos los barcos por "default" no estan puestos en el casillero.
+                    boats_array[i][j].placed = false;// al empezar, todos los barcos por "default" no estan puestos en el grid.
                     boats_array[i][j].x_pos[k] = -2;
                     boats_array[i][j].y_pos[k] = -2;
                 }
@@ -69,21 +69,21 @@ int main() {
 
         select_match_available_boats(boats_array);//se llama a la funcion que crea todos los barcos
 
-        //se empieza a crear el casillero
+        //se empieza a crear el grid
         char size_x, size_y;
 
         for (;;) {
 
-            cout << "\nQue dimensiones del casillero quieren? Escriba la dimension horizontal [espacio] dimension vertical\n";
+            cout << "\nQue dimensiones del grid quieren? Escriba la dimension horizontal [espacio] dimension vertical\n";
             cout << "Ejemplos: 10 10, 5 6, 26 5. EL MINIMO ES CINCO Y EL MAXIMO ES VEINTISEIS\n";
-            cin >> size_x >> size_y;//el casillero toma el tamaño horizontal y vertical que quieran los jugadores
+            cin >> size_x >> size_y;//el grid toma el tamaño horizontal y vertical que quieran los jugadores
 
             if ((size_x > 26 || size_y > 26) || (size_x < 5 || size_y < 5)) {
-                //si el casillero es demasiado grande o demasiado pequeño tal que no quepan los barcos muy grandes, se le obliga al player reintroducirla. El programa produce otra iteracion de este bucle 'for' infinito
+                //si el grid es demasiado grande o demasiado pequeño tal que no quepan los barcos muy grandes, se le obliga al player reintroducirla. El programa produce otra iteracion de este bucle 'for' infinito
                 cout << "\nHas introducido una dimension demasiado pequeña o grande\n";
                 continue;
             }
-            else break;//si el player introduce unas dimensiones sensatas del casillero, el programa escapa del bucle "for" infinito y prosigue.  
+            else break;//si el player introduce unas dimensiones sensatas del grid, el programa escapa del bucle "for" infinito y prosigue.  
         }
 
         place_boats(grid, player_names[0], boats_array, size_x, size_y, 0);
@@ -101,7 +101,7 @@ int main() {
 }
 
 
-void select_match_available_boats(Boat(&boats_array)[20][2]) {//esta funcion crea todos los barcos y los coloca ordenadamente en el array "boats_array", pero no les asigna una posicion en el casillero
+void select_match_available_boats(Boat(&boats_array)[20][2]) {//esta funcion crea todos los barcos y los coloca ordenadamente en el array "boats_array", pero no les asigna una posicion en el grid
 
     int i, small_boats_count, med_boats_count, big_boats_count, huge_boats_count, total_boat_count;
 
@@ -157,8 +157,8 @@ void place_boats(char(&grid)[26][26][2], string nick, Boat(&boats_array)[20][2],
 
     cout << "\nLe toca a " << nick << " posicionar sus barcos; el otro player, NO MIRE \n\n";
 
-    cout << "Este es su casillero, " << nick << ": ";
-    display_my_grid(grid, size_x, size_y, player);//se le muestra el casillero al player x, mediante una funcion independiente.
+    cout << "Este es su grid, " << nick << ": ";
+    display_my_grid(grid, size_x, size_y, player);//se le muestra el grid al player x, mediante una funcion independiente.
     cout << "Los numeros de arriba indican la columna, y las letras de la izquierda la fila.\n\n";
 
     int selected_boat_type;// se crea la variable selected_boat_type, que se va a utilizar posteriormente para manipular el array "grid".
@@ -237,7 +237,7 @@ void place_boats(char(&grid)[26][26][2], string nick, Boat(&boats_array)[20][2],
 
             if (--input_x_coord < 0 || input_x_coord > size_x || input_y_coord < 0 || input_y_coord > size_y) {
 
-                cout << "Has introducido una orientation o posicion incorrecta, o esta ultima esta fuera de rango del casillero. Por favor, introduce una posicion y orientation correctamente:";
+                cout << "Has introducido una orientation o posicion incorrecta, o esta ultima esta fuera de rango del grid. Por favor, introduce una posicion y orientation correctamente:";
                 continue;
             }
 
@@ -322,8 +322,8 @@ void place_boats(char(&grid)[26][26][2], string nick, Boat(&boats_array)[20][2],
                 (grid)[boats_array[selected_boat_type][player].x_pos[i]][boats_array[selected_boat_type][player].y_pos[i]][player] = 1;
             }
 
-            boats_array[selected_boat_type][player].placed = true;//el barco elegido se define como puesto en el casillero
-            display_my_grid(grid, size_x, size_y, player);//se muestra el casillero para ver cómo quedó el nuevo barco puesto 
+            boats_array[selected_boat_type][player].placed = true;//el barco elegido se define como puesto en el grid
+            display_my_grid(grid, size_x, size_y, player);//se muestra el grid para ver cómo quedó el nuevo barco puesto 
             break;//escape de este bucle "while" que se encarga de posicionar el barco elegido.
         }
 
@@ -333,31 +333,26 @@ void place_boats(char(&grid)[26][26][2], string nick, Boat(&boats_array)[20][2],
 
 bool start_match(char(&grid)[26][26][2], string nick[2], int size_x, int size_y, Boat(&boats_array)[20][2]) {
     int i, j;
-    int contador_aciertos[2], contador_fallos[2], contador_tiros[2];
-    
-    for (i = 0; i < 2; i++) {//se vuelven cero los contadores de aciertos y fallos al empezar, para que sea posible sumarles unos.
-        contador_aciertos[i] = 0;
-        contador_fallos[i] = 0;
-    }
+    int contador_aciertos[2] {0, 0}, contador_fallos[2] {0, 0}, contador_tiros[2] {0, 0};
     
     srand(time(NULL));
     bool player_on_turn = rand() % 1; //se elige aleatoriamente al player que va a empezar.
     cout << "Le toca al player " << player_on_turn + 1 << " empezar, quien seria: " << nick[player_on_turn] << endl; 
     
-    char casillero_registrodeataques[26][26][2];//se crea el casillero de registro de ataques exitosos y fallados sobre el enemigo
+    char casillero_registrodeataques[26][26][2];//se crea el grid de registro de ataques exitosos y fallados sobre el enemigo
     for (i = 0; i < 26; i++) {
         for (j = 0; j < 26; j++) {
-            casillero_registrodeataques[i][j][0] = '?';//se vuelven todas las casillas de este casillero signos de interrogación ya que no se atacó ninguna casilla y no se sabe lo que hay ahí.
+            casillero_registrodeataques[i][j][0] = '?';//se vuelven todas las casillas de este grid signos de interrogación ya que no se atacó ninguna casilla y no se sabe lo que hay ahí.
             casillero_registrodeataques[i][j][1] = '?';
         }
     }
 
     while (1) {
 
-        cout << "Tu casillero actualmente, " << nick[player_on_turn] << ": ";
-        display_my_grid(grid, size_x, size_y, player_on_turn);//simplemente se muestra el casillero normal que muestra tu propio casillero para ver que has perdido...
+        cout << "Tu grid actualmente, " << nick[player_on_turn] << ": ";
+        display_my_grid(grid, size_x, size_y, player_on_turn);//simplemente se muestra el grid normal que muestra tu propio grid para ver que has perdido...
 		//...cada vez que vuelve a ser tu turno, tras el ataque del enemigo.
-        cout << "El casillero de tus ataques al enemigo:";//se muestra el casillero mencionado anteriormente, de los signos de preguntas. Este registra los ataques hechos al enemigo.
+        cout << "El grid de tus ataques al enemigo:";//se muestra el grid mencionado anteriormente, de los signos de preguntas. Este registra los ataques hechos al enemigo.
         show_attacks_grid(casillero_registrodeataques, size_x, size_y, player_on_turn);
 
 
@@ -387,8 +382,8 @@ bool start_match(char(&grid)[26][26][2], string nick[2], int size_x, int size_y,
                 contador_aciertos[player_on_turn]++;//...se suma uno al contador de aciertos
                 cout << "\n\nAL ATACAR LA POSICION " << input_x_coord + 1 << " " << input_letter_coord << ", HAS DADO EN EL BLANCO.";
                 
-                casillero_registrodeataques[attacked_x][attacked_y][player_on_turn] = 'X';//se marca una 'X' en la posicion correspondiente del casillero-registro de ataques al enemigo
-                show_attacks_grid(casillero_registrodeataques, size_x, size_y, player_on_turn);// se muestra este mismo casillero, el '?' fue reemplazado por una 'X'
+                casillero_registrodeataques[attacked_x][attacked_y][player_on_turn] = 'X';//se marca una 'X' en la posicion correspondiente del grid-registro de ataques al enemigo
+                show_attacks_grid(casillero_registrodeataques, size_x, size_y, player_on_turn);// se muestra este mismo grid, el '?' fue reemplazado por una 'X'
 
                 int barcoatacado = 0;
                 for (i = 0; i < 20; i++) {//este bucle 'for' chequea barco por barco del array "array_barcos"...
@@ -422,10 +417,10 @@ bool start_match(char(&grid)[26][26][2], string nick[2], int size_x, int size_y,
             }
             else {// si hay un '0' en la casilla atacada...
             	
-                casillero_registrodeataques[attacked_x][attacked_y][player_on_turn] = '/';// el casillero de registro de ataques vuelve a esa posición un '/' (que significa que no hay nada ahí)
+                casillero_registrodeataques[attacked_x][attacked_y][player_on_turn] = '/';// el grid de registro de ataques vuelve a esa posición un '/' (que significa que no hay nada ahí)
                 contador_fallos[player_on_turn]++;//se suma uno al contador de tiros fallados
                 cout << "\n\nDesafortunadamente, no hay nada ahi.";
-                show_attacks_grid(casillero_registrodeataques, size_x, size_y, player_on_turn);//se le muestra al atacante su casillero de registro de ataques.
+                show_attacks_grid(casillero_registrodeataques, size_x, size_y, player_on_turn);//se le muestra al atacante su grid de registro de ataques.
                 break;
             }
         }
@@ -499,7 +494,7 @@ bool start_match(char(&grid)[26][26][2], string nick[2], int size_x, int size_y,
 }
 
 
-void display_my_grid(const char (&casillero)[26][26][2], int size_x, int size_y, bool player) {//Esta funcion muestra el estado actual del casillero del player X
+void display_my_grid(const char (&grid)[26][26][2], int size_x, int size_y, bool current_player) {//Esta funcion muestra el estado actual del grid del player X
 
     int i, j;
 
@@ -512,11 +507,11 @@ void display_my_grid(const char (&casillero)[26][26][2], int size_x, int size_y,
     }
     cout << "\n\n";
 
-    char letra_fila = 'A';//Esta sección escribe las letras de la izquierda que indican la coordenada Y de cierta fila.
+    char row_letter = 'A';//Esta sección escribe las letras de la izquierda que indican la coordenada Y de cierta fila.
     for (i = 0; i < size_y; i++) {
-        cout << letra_fila++ << ": ";
+        cout << row_letter++ << ": ";
         for (j = 0; j < size_x; j++) {
-            cout << casillero[j][i][player] << " ";
+            cout << grid[j][i][current_player] << " ";
         }
         cout << endl;
     }
@@ -524,7 +519,7 @@ void display_my_grid(const char (&casillero)[26][26][2], int size_x, int size_y,
     return;
 }
 
-void show_attacks_grid(const char(&casillero)[26][26][2], int size_x, int size_y, bool player) {//Esta funcion muestra el estado actual del casillero del player X
+void show_attacks_grid(const char(&grid)[26][26][2], int size_x, int size_y, bool current_player) {//Esta funcion muestra el estado actual del grid del player X
     int i, j;
     cout << "\n\n  "; //Esta sección escribe los numeros de arriba que indican la coordenada X de cierta columna.
     for (i = 0; i < size_x && i < 10; i++) {
@@ -534,11 +529,11 @@ void show_attacks_grid(const char(&casillero)[26][26][2], int size_x, int size_y
         cout << i + 1;
     }
     cout << "\n\n";
-    char letra_fila = 'A';//Esta sección escribe las letras de la izquierda que indican la coordenada Y de cierta fila.
+    char row_letter = 'A';//Esta sección escribe las letras de la izquierda que indican la coordenada Y de cierta fila.
     for (i = 0; i < size_y; i++) {
-        cout << letra_fila++ << ": ";
+        cout << row_letter++ << ": ";
         for (j = 0; j < size_x; j++) {
-            cout << casillero[j][i][player] << " ";
+            cout << grid[j][i][current_player] << " ";
         }
         cout << endl;
     }
